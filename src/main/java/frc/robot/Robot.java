@@ -105,7 +105,8 @@ public class Robot extends TimedRobot {
     right1.set(ControlMode.PercentOutput, rightSide);
     left1.set(ControlMode.PercentOutput, leftSide);
 
-    /*get input from gamer
+    /*Order of events:
+     *get input from gamer
      * translate beep bop to vroom vroom
      * tell speed controller how much vroom vroom
      */
