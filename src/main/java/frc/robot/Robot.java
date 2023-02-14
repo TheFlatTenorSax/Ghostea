@@ -107,10 +107,10 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double leftSide = gamer.getLeftY();
-    double rightSide = gamer.getRightY();
-    boolean pressed = gamer.getLeftBumper();
-    boolean bop = beep.get();
+    double leftSide = gamer.getLeftY(); //Left Stick up/down will control left set of wheels
+    double rightSide = gamer.getRightY(); //Right Stick up/down will control right set of wheels (getRightY = get input from Y-axis)
+    boolean pressed = gamer.getLeftBumper(); // Left bumper on controller activates shooter
+    boolean bop = beep.get(); // Sensor stuff
     right1.set(ControlMode.PercentOutput, rightSide);
     left1.set(ControlMode.PercentOutput, leftSide);
 
@@ -126,9 +126,9 @@ public class Robot extends TimedRobot {
     //goodnight.
     //Copyright(r) Ryan Chan 2023. All rights reserved.
 
-    if(pressed == false || !bop){
+    if(pressed == false || !bop){ // If the left bumper on the controller is not pressed (|| = or) if bop senses something...
       shootyThing.set(0);
-    }else if(pressed == true){
+    }else if(pressed == true){ //If the left bumper IS pressed...
       shootyThing.set(0.6);
     }
 
