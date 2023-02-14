@@ -6,7 +6,10 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +29,8 @@ public class Robot extends TimedRobot {
   private TalonFX right2;
   private TalonFX left1;
   private TalonFX left2;
+  private CANSparkMax shootyThing;
+  private DigitalInput beep;
   private XboxController gamer;
 
   /**
@@ -41,6 +46,8 @@ public class Robot extends TimedRobot {
     right2 = new TalonFX(2);
     left1 = new TalonFX(3);
     left2 = new TalonFX(1); 
+    shootyThing = new CANSparkMax(1, MotorType.kBrushless);
+    beep = new DigitalInput(9);
     gamer = new XboxController(0);
     left2.follow(left1);
     right2.follow(right1);
@@ -102,6 +109,8 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double leftSide = gamer.getLeftY();
     double rightSide = gamer.getRightY();
+    boolean pressed = gamer.getLeftBumper();
+    boolean bop = beep.get();
     right1.set(ControlMode.PercentOutput, rightSide);
     left1.set(ControlMode.PercentOutput, leftSide);
 
@@ -116,6 +125,12 @@ public class Robot extends TimedRobot {
     //ayushi went to sleep
     //goodnight.
     //Copyright(r) Ryan Chan 2023. All rights reserved.
+
+    if(pressed == false || !bop){
+      shootyThing.set(0);
+    }else if(pressed == true){
+      shootyThing.set(0.6);
+    }
 
   }
 
