@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -111,6 +112,7 @@ public class Robot extends TimedRobot {
     double rightSide = gamer.getRightY(); //Right Stick up/down will control right set of wheels (getRightY = get input from Y-axis)
     boolean pressed = gamer.getLeftBumper(); // Left bumper on controller activates shooter
     boolean bop = beep.get(); // Sensor stuff
+    SmartDashboard.putBoolean("Sensor", bop);
     right1.set(ControlMode.PercentOutput, rightSide);
     left1.set(ControlMode.PercentOutput, leftSide);
 
