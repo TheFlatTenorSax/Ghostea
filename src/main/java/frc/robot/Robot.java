@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -33,6 +34,8 @@ public class Robot extends TimedRobot {
   private CANSparkMax shootyThing;
   private DigitalInput beep;
   private XboxController gamer;
+  private double lMotor;
+  private double rMotor;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -42,7 +45,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    // m_robotContainer = new RobotContainer(); <-- stupid line. makes robot funny. (temporarily)
     right1 = new TalonFX(4);
     right2 = new TalonFX(2);
     left1 = new TalonFX(3);
@@ -54,6 +57,10 @@ public class Robot extends TimedRobot {
     right2.follow(right1);
     left1.setInverted(true);
     left2.setInverted(true);
+    right1.setNeutralMode(NeutralMode.Brake);
+    right2.setNeutralMode(NeutralMode.Brake);
+    left1.setNeutralMode(NeutralMode.Brake);
+    left2.setNeutralMode(NeutralMode.Brake);
   }
 
   /**
@@ -92,7 +99,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+
+  }
 
   @Override
   public void teleopInit() {
@@ -100,6 +109,7 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -109,12 +119,16 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     double leftSide = gamer.getLeftY(); //Left Stick up/down will control left set of wheels
-    double rightSide = gamer.getRightY(); //Right Stick up/down will control right set of wheels (getRightY = get input from Y-axis)
+    double rightSide = gamer.getRightX(); //Right Stick up/down will control right set of wheels (getRightY = get input from Y-axis)
+    double left = leftSide + rightSide;
+    double right = leftSide - rightSide;
     boolean pressed = gamer.getLeftBumper(); // Left bumper on controller activates shooter
+    boolean moveitmoveit = gamer.getAButtonPressed();
     boolean bop = beep.get(); // Sensor stuff
     SmartDashboard.putBoolean("Sensor", bop);
-    right1.set(ControlMode.PercentOutput, rightSide);
-    left1.set(ControlMode.PercentOutput, leftSide);
+    SmartDashboard.putNumber("LeftAutoMotors", lMotor);
+    SmartDashboard.putNumber("RightAutoMotors", rMotor);
+  
 
     /*Order of events:
      *get input from gamer
@@ -128,10 +142,37 @@ public class Robot extends TimedRobot {
     //goodnight.
     //Copyright(r) Ryan Chan 2023. All rights reserved.
 
+    // Arcade drive mathy stuff
+    if(left > 1.0){
+      left = 1.0;
+    }else if(right > 1.0){
+      right = 1.0;
+    }else if(left < -1.0){
+      left = -1.0;
+    }else if(right < -1.0){
+      right = -1.0;
+    }
+
+    right1.set(ControlMode.PercentOutput, right);
+    left1.set(ControlMode.PercentOutput, left);
+
     if(pressed == false || !bop){ // If the left bumper on the controller is not pressed (|| = or) if bop senses something...
       shootyThing.set(0);
     }else if(pressed == true){ //If the left bumper IS pressed...
-      shootyThing.set(0.6);
+      shootyThing.set(-0.6);
+    }
+
+    if(moveitmoveit){
+      lMotor = left1.getSelectedSensorPosition();
+      rMotor = right1.getSelectedSensorPosition();
+      double new_pos_left = lMotor + 2048.0*1.910*12.75;
+      double new_pos_right = rMotor + 2048.0*1.910*12.75;
+      SmartDashboard.putNumber("LeftAutoStarting", lMotor);
+    SmartDashboard.putNumber("RightAutoStarting", rMotor);
+    SmartDashboard.putNumber("LeftAutoMotors", new_pos_left);
+    SmartDashboard.putNumber("RightAutoMotors", new_pos_right);
+      left1.set(ControlMode.Position, new_pos_left);
+      right1.set(ControlMode.Position, new_pos_right);
     }
 
   }
