@@ -32,6 +32,8 @@ public class Robot extends TimedRobot {
   private TalonFX left1;
   private TalonFX left2;
   private CANSparkMax shootyThing;
+  private CANSparkMax intake;
+  private CANSparkMax neo2;
   private DigitalInput beep;
   private XboxController gamer;
   private double lMotor;
@@ -51,6 +53,8 @@ public class Robot extends TimedRobot {
     left1 = new TalonFX(3);
     left2 = new TalonFX(1); 
     shootyThing = new CANSparkMax(1, MotorType.kBrushless);
+    intake = new CANSparkMax(3, MotorType.kBrushless);
+    neo2 = new CANSparkMax(2,MotorType.kBrushless);
     beep = new DigitalInput(9);
     gamer = new XboxController(0);
     left2.follow(left1);
@@ -122,7 +126,8 @@ public class Robot extends TimedRobot {
     double rightSide = gamer.getRightX(); //Right Stick up/down will control right set of wheels (getRightY = get input from Y-axis)
     double left = leftSide + rightSide;
     double right = leftSide - rightSide;
-    boolean pressed = gamer.getLeftBumper(); // Left bumper on controller activates shooter
+    boolean intakePressed = gamer.getRightBumper(); // Right bumper on controller activates intake (hopefully)
+    boolean pressed = gamer.getLeftBumper();
     boolean moveitmoveit = gamer.getAButtonPressed();
     boolean bop = beep.get(); // Sensor stuff
     SmartDashboard.putBoolean("Sensor", bop);
@@ -162,7 +167,15 @@ public class Robot extends TimedRobot {
       shootyThing.set(-0.6);
     }
 
-    if(moveitmoveit){
+    if(intakePressed == false){
+      intake.set(0);
+      neo2.set(0);
+    }else if(intakePressed == true){
+      intake.set(-0.3);
+      neo2.set(-0.3);
+    } 
+
+    if(moveitmoveit){ //Does not work (Why...?)
       lMotor = left1.getSelectedSensorPosition();
       rMotor = right1.getSelectedSensorPosition();
       double new_pos_left = lMotor + 2048.0*1.910*12.75;
