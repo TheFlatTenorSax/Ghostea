@@ -5,8 +5,10 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -48,6 +50,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     // m_robotContainer = new RobotContainer(); <-- stupid line. makes robot funny. (temporarily)
+    TalonFXConfiguration how = new TalonFXConfiguration();
     right1 = new TalonFX(4);
     right2 = new TalonFX(2);
     left1 = new TalonFX(3);
@@ -57,6 +60,9 @@ public class Robot extends TimedRobot {
     neo2 = new CANSparkMax(2,MotorType.kBrushless);
     beep = new DigitalInput(9);
     gamer = new XboxController(0);
+    left2.config_kP(0, .01);
+    right1.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute,0,20);
+    left1.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute,0,20);
     left2.follow(left1);
     right2.follow(right1);
     left1.setInverted(true);
@@ -132,7 +138,7 @@ public class Robot extends TimedRobot {
     boolean bop = beep.get(); // Sensor stuff
     SmartDashboard.putBoolean("Sensor", bop);
     SmartDashboard.putNumber("LeftAutoMotors", lMotor);
-    SmartDashboard.putNumber("RightAutoMotors", rMotor);
+    SmartDashboard.putNumber("RightAutoMotors", right1.getSelectedSensorPosition() / 2048.0);
   
 
     /*Order of events:
@@ -158,8 +164,8 @@ public class Robot extends TimedRobot {
       right = -1.0;
     }
 
-    right1.set(ControlMode.PercentOutput, right);
-    left1.set(ControlMode.PercentOutput, left);
+    /*right1.set(ControlMode., right);
+    left1.set(ControlMode.PercentOutput, left);*/
 
     if(pressed == false || !bop){ // If the left bumper on the controller is not pressed (|| = or) if bop senses something...
       shootyThing.set(0);
@@ -175,15 +181,17 @@ public class Robot extends TimedRobot {
       neo2.set(-0.3);
     } 
 
+    SmartDashboard.putBoolean("isApressed",moveitmoveit);
+
     if(moveitmoveit){ //Does not work (Why...?)
       lMotor = left1.getSelectedSensorPosition();
       rMotor = right1.getSelectedSensorPosition();
       double new_pos_left = lMotor + 2048.0*1.910*12.75;
       double new_pos_right = rMotor + 2048.0*1.910*12.75;
       SmartDashboard.putNumber("LeftAutoStarting", lMotor);
-    SmartDashboard.putNumber("RightAutoStarting", rMotor);
-    SmartDashboard.putNumber("LeftAutoMotors", new_pos_left);
-    SmartDashboard.putNumber("RightAutoMotors", new_pos_right);
+      SmartDashboard.putNumber("RightAutoStarting", rMotor);
+      SmartDashboard.putNumber("LeftMotorsAuto", new_pos_left);
+      SmartDashboard.putNumber("RightMotorsAuto", new_pos_right/2048.0);
       left1.set(ControlMode.Position, new_pos_left);
       right1.set(ControlMode.Position, new_pos_right);
     }
